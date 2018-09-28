@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -e
+
+readonly DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly localgw=${LOCAL_GATEWAY:-192.168.1.254}
+readonly vpnif=${VPN_INTERFACE:-utun1}
+readonly host_whitelist=$(cat "$DIR"/whitelist.txt | grep -v ".*#.*" | grep -v "^$")
+
+# patch gateway and VPN route
+route delete default
+route add default "$localgw"
+route add -net 10 -interface "$vpnif"
+route add -net 172 -interface "$vpnif"
+
+function add_ip () {
+  route add -net $1 -interface "$vpnif" > /dev/null 2>&1 || true
+}
+
+function add_hostip () {
+  route add $1 -interface "$vpnif" > /dev/null 2>&1 || true
+}
+
+function get_existing_routes () {
+  netstat -nr -f inet | awk '{print $2, $1}' | grep "$vpnif" | awk '{print $2}' | cat
+}
+
+function delete_route () {
+  route -n delete "$1" -interface "$vpnif" > /dev/null 2>&1 || true
+}
+
+ip_routes=()
+
+echo -e "Querying..."
+
+for host in ${host_whitelist[*]}
+do
+  if [[ $host =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+    echo -e "Host \e[35m$host\e[0m is ip address \e[32m$host\e[0m"
+    ip_routes+=($host)
+  else
+    ip_list=($(dig +short $host))
+    for ip in ${ip_list[*]}
+    do
+      if [[ $ip =~ ^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$ ]]; then
+        echo -e "Host \e[35m$host\e[0m resolves to \e[32m$ip\e[0m"
+        ip_routes+=($ip)
+      fi
+    done
+    [ ${#ip_list[@]} -eq "0" ] && echo -e "\e[91mCould not resolve host \e[35m$host\e[0m"
+  fi
+done
+
+readonly existing_routes=$(get_existing_routes)
+
+echo -e "\e[31mDeleting\e[0m existing routes..."
+for address in ${existing_routes[*]}
+do
+  delete_route $address
+done
+
+echo -e "\e[32mAdding\e[0m new routes..."
+for address in ${ip_routes[*]}
+do
+  if [[ $address =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+    add_ip $address
+  else
+    add_hostip $address
+  fi
+done
+
+echo "Done."
