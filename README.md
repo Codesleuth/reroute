@@ -42,3 +42,11 @@ Get the interface name of the VPN in use. This is likely to be `utun1` (the defa
 You can also easily update your whitelist and and run again. The entries will be removed when you disconnect from the VPN so ensure you reconnect if you want to wipe out the list (or use `route del <ip>`).
 
 Some particular sets of VPN software will nuke your route table when they disconnect, so be aware that you may have to run this again when you move between WiFi access points, or resume from sleep etc.
+
+# License
+
+MIT (see `LICENSE` file)
+
+# Contributing
+
+Please do open PRs.
