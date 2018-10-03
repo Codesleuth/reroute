@@ -4,7 +4,7 @@ set -e
 readonly DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly localgw=${LOCAL_GATEWAY:-192.168.1.254}
 readonly vpnif=${VPN_INTERFACE:-utun1}
-readonly host_whitelist=$(cat "$DIR"/whitelist.txt | grep -v ".*#.*" | grep -v "^$")
+readonly host_routelist=$(cat "$DIR"/routes.txt | grep -v ".*#.*" | grep -v "^$")
 
 # patch gateway and VPN route
 route delete default
@@ -32,7 +32,7 @@ ip_routes=()
 
 echo -e "Querying..."
 
-for host in ${host_whitelist[*]}
+for host in ${host_routelist[*]}
 do
   if [[ $host =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
     echo -e "Host \e[35m$host\e[0m is ip address \e[32m$host\e[0m"
