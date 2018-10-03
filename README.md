@@ -5,7 +5,7 @@
 Clone this repo
 
 ```bash
-git clone https://github.com/Codesleuth/vpn-fix-2
+git clone https://github.com/Codesleuth/reroute
 ```
 
 ### Whitelist
@@ -24,9 +24,9 @@ github.com
 ### Connect and Fix!
 
 1. Connect to your VPN
-2. Run the `vpn-fix` script and specify your prefered gateway and vpn interface
+2. Run the `reroute` script and specify your prefered gateway and vpn interface
     ```bash
-    sudo -E bash -c 'LOCAL_GATEWAY=192.168.1.254 VPN_INTERFACE=utun1 ./vpn-fix'
+    sudo -E bash -c 'LOCAL_GATEWAY=192.168.1.254 VPN_INTERFACE=utun1 ./reroute'
     ```
 
 #### `LOCAL_GATEWAY`
