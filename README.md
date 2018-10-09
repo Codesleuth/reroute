@@ -24,7 +24,7 @@ github.com
 ### Connect and Fix!
 
 1. Connect to your VPN
-2. Run the `reroute` script and specify your prefered gateway and vpn interface
+2. Run the `reroute` script and specify your preferred gateway and vpn interface
     ```bash
     sudo -E bash -c 'LOCAL_GATEWAY=192.168.1.254 VPN_INTERFACE=utun1 ./reroute'
     ```
